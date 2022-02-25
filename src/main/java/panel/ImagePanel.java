@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImagePanel {
+public class ImagePanel extends Thread {
     private JPanel panel;
     private static JLabel imageDisplay = new JLabel("", SwingConstants.CENTER);
     private static List<File> images = new ArrayList<>();
     private static int currentImage = 0;
+    private static boolean animated = false;
 
     public ImagePanel() {
         panel = new JPanel();
@@ -40,6 +41,28 @@ public class ImagePanel {
         if (currentImage == 0) return;
         currentImage--;
         changeImage();
+    }
+
+    public static void startAnimation() {
+        animated = true;
+    }
+
+    public static void stopAnimation() {
+        animated = false;
+    }
+
+    public void run() {
+        while (true) {
+            try {
+                sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (animated) {
+                if (images.size() == currentImage + 1) currentImage = -1;
+                nextImage();
+            }
+        }
     }
 
     public static void changeImage() {

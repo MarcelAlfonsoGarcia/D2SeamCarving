@@ -29,6 +29,18 @@ public class ActionPanel {
         });
 
         JButton animate = new JButton("Animate");
+        animate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (animate.getText().equalsIgnoreCase("animate")) {
+                    ImagePanel.startAnimation();
+                    animate.setText("Stop Animate");
+                } else {
+                    ImagePanel.stopAnimation();
+                    animate.setText("Animate");
+                }
+            }
+        });
 
         panel.add(previous);
         panel.add(next);
