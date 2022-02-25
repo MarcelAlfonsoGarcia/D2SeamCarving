@@ -2,6 +2,7 @@ package panel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainPanel {
 
@@ -16,7 +17,6 @@ public class MainPanel {
         contentPane = frame.getContentPane();
         contentPane.setLayout(cardLayout);
         panel = new JPanel();
-        panel.setLayout(new GridLayout(3,1));
 
         SettingsPanel sp = new SettingsPanel();
         ImagePanel ip = new ImagePanel();
@@ -28,8 +28,12 @@ public class MainPanel {
 
         contentPane.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        frame.setSize(500,500);
         frame.setTitle("Carver");
         frame.setVisible(true);
+    }
+
+    public static void changeFrameSize(int width, int height) {
+        frame.setSize(width, height);
     }
 }

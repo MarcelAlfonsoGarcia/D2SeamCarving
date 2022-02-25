@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.text.ParseException;
 
 public class SettingsPanel {
@@ -17,14 +18,16 @@ public class SettingsPanel {
 
     public SettingsPanel() {
         panel = new JPanel();
-        panel.setLayout(new GridLayout(1,3));
+        panel.setLayout(new GridLayout(1,4));
 
         JButton selectImage = new JButton("Select Image");
 
         JFileChooser filePicker = new JFileChooser();
         filePicker.addChoosableFileFilter(new FileNameExtensionFilter(
                 "Image files", ImageIO.getReaderFileSuffixes()));
+        filePicker.setCurrentDirectory(new File("./"));
 
+        JLabel imageName = new JLabel("None Selected");
         selectImage.addActionListener( new ActionListener()
         {
             @Override
@@ -34,10 +37,16 @@ public class SettingsPanel {
 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     imageFile = filePicker.getSelectedFile();
+                    imageName.setText(imageFile.getName());
+                    try {
+                        ImagePanel.setImage(imageFile);
+                    } catch (IOException ex) {
+                        System.out.println("Whoops");
+                    }
                 }
+
             }
         });
-
 
         JTextField carvesField = new JTextField("");
         carvesField.setColumns(4);
@@ -59,6 +68,7 @@ public class SettingsPanel {
         });
 
         panel.add(selectImage);
+        panel.add(imageName);
         panel.add(carvesField);
         panel.add(submitButton);
     }
