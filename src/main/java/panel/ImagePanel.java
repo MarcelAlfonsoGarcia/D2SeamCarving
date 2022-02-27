@@ -1,17 +1,14 @@
 package panel;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImagePanel extends Thread {
     private JPanel panel;
     private static JLabel imageDisplay = new JLabel("", SwingConstants.CENTER);
-    private static List<File> images = new ArrayList<>();
+    private static List<BufferedImage> images = new ArrayList<>();
     private static int currentImage = 0;
     private static boolean animated = false;
 
@@ -24,7 +21,7 @@ public class ImagePanel extends Thread {
         return panel;
     }
 
-    public static void addImages(List<File> newImages) {
+    public static void addImages(List<BufferedImage> newImages) {
         images.clear();
         images.addAll(newImages);
         currentImage = 0;
@@ -54,7 +51,7 @@ public class ImagePanel extends Thread {
     public void run() {
         while (true) {
             try {
-                sleep(2000);
+                sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -66,14 +63,10 @@ public class ImagePanel extends Thread {
     }
 
     public static void changeImage() {
-        try {
-            BufferedImage bi = ImageIO.read(images.get(currentImage));
-            ImageIcon icon = new ImageIcon(bi);
-            imageDisplay.setIcon(icon);
+    	var bi = images.get(currentImage);
+        ImageIcon icon = new ImageIcon(bi);
+        imageDisplay.setIcon(icon);
 
-            MainPanel.changeFrameSize(bi.getWidth() + 50, bi.getHeight() + 140);
-        } catch (IOException e) {
-            System.out.println("Could not load file");
-        }
+        MainPanel.changeFrameSize(bi.getWidth() + 50, bi.getHeight() + 140);
     }
 }

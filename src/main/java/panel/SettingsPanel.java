@@ -6,14 +6,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import imageWrapper.ImageWrapper;
 
 public class SettingsPanel {
     private JPanel panel;
-    private File imageFile;
+    private BufferedImage image;
 
     public SettingsPanel() {
         panel = new JPanel();
@@ -36,9 +39,16 @@ public class SettingsPanel {
                 int returnVal = filePicker.showOpenDialog(panel);
 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    imageFile = filePicker.getSelectedFile();
+                    var imageFile = filePicker.getSelectedFile();
                     imageName.setText(imageFile.getName());
-                    ImagePanel.addImages(Collections.singletonList(imageFile));
+                    
+                    try {
+                    	image = ImageIO.read(imageFile);
+                        ImagePanel.addImages(Collections.singletonList(image));
+                    } catch (IOException ex) {
+                    	System.out.println("Could not load file: " + imageFile.getName());
+                    	image = null;
+                    }
                 }
             }
         });
@@ -67,12 +77,12 @@ public class SettingsPanel {
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (imageFile == null) {
+                if (image == null) {
                     throw new IllegalArgumentException("Please select a file to carve");
                 }
 
                 int numberCarves = 0;
-                String seamDirection;
+                boolean bHorizontalSeam = false;
                 try {
                     String numberCarvesField = carvesField.getText();
                     if (numberCarvesField.isEmpty()) System.out.println("whelp");
@@ -81,15 +91,21 @@ public class SettingsPanel {
                     throw new IllegalArgumentException("Input must be a numeric value");
                 }
 
-                if (verticalButton.isSelected()) seamDirection = "vertical";
-                if (horizontalButton.isSelected()) seamDirection = "horizontal";
+                if (verticalButton.isSelected()) bHorizontalSeam = false;
+                if (horizontalButton.isSelected()) bHorizontalSeam = true;
+                
 
-                // here is where we will call the carving functions. Expected result is a List<File>
-                // something like: carve(imageFile, numberCarves, seamDirection)
-                List<File> fileList = new ArrayList<>();
-                fileList.add(new File("C:\\Users\\marce\\Documents\\Marcel School\\Data Structures 2\\SeamCarving\\test1.jpg"));
-                fileList.add(new File("C:\\Users\\marce\\Documents\\Marcel School\\Data Structures 2\\SeamCarving\\test2.jpg"));
-                ImagePanel.addImages(fileList);
+                var imageWrap = new ImageWrapper(image);
+                
+                if (bHorizontalSeam && numberCarves >= imageWrap.getHeight()) {
+                	throw new IllegalArgumentException("Input must be a numeric value less than image height.");
+                } else if (numberCarves >= imageWrap.getWidth()) {
+                	throw new IllegalArgumentException("Input must be a numeric value less than image width.");
+                }
+                
+                // here is where we will call the carving functions. Expected result is a List<BufferedImage>
+                var carvedUpImages = reallyDumbSeamCarvingAlgorithmToReplaceWithRealOne(bHorizontalSeam, numberCarves, imageWrap);
+                ImagePanel.addImages(carvedUpImages);
             }
         });
 
@@ -101,5 +117,40 @@ public class SettingsPanel {
 
     public JPanel getPanel() {
         return panel;
+    }
+    
+    // super dumb seam carving algorithm below.
+    // for a given image, select a seam that is approximately near the middle
+    // and remove it N times.
+    static private List<BufferedImage> reallyDumbSeamCarvingAlgorithmToReplaceWithRealOne(boolean bHorizontalSeam, int nCarves, ImageWrapper imageWrap) {
+    	ArrayList<BufferedImage> result = new ArrayList<>();
+    	// Add the first one so we can see where we started
+    	result.add(imageWrap.currentContentsAsImage());
+    	
+    	if (bHorizontalSeam) {
+    		for (int i = 0; i < nCarves; ++i) {
+    			final int nRowToRemove = imageWrap.getHeight() / 2;
+    			
+    			var seam = new int[imageWrap.getWidth()];
+    			for (int j = 0; j < seam.length; ++j)
+    				seam[j] = nRowToRemove;
+    			
+    			imageWrap.removeHorizontalSeam(seam);
+    			result.add(imageWrap.currentContentsAsImage());
+    		}
+    	} else {
+    		for (int i = 0; i < nCarves; ++i) {
+    			final int nColToRemove = imageWrap.getWidth() / 2;
+    			
+    			var seam = new int[imageWrap.getHeight()];
+    			for (int j = 0; j < seam.length; ++j)
+    				seam[j] = nColToRemove;
+    			
+    			imageWrap.removeVerticalSeam(seam);
+    			result.add(imageWrap.currentContentsAsImage());
+    		}
+    	}
+    	
+    	return result;
     }
 }
