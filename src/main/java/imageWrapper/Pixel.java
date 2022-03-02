@@ -5,6 +5,7 @@ public class Pixel {
 	final private int m_r;
 	final private int m_g;
 	final private int m_b;
+	final private Double m_energy; // may be null
 	
 	// Args: 32 bit pixel represented as 0xaarrggbb
 	// we're just gonna ignore the alpha value   
@@ -13,6 +14,7 @@ public class Pixel {
 		m_r = (nPixel & 0x00FF0000) >> 16;
 		m_g = (nPixel & 0x0000FF00) >> 8;
 		m_b = (nPixel & 0x000000FF);
+		m_energy = null;
 	}
 	
 	public Pixel(int r, int g, int b)
@@ -25,6 +27,20 @@ public class Pixel {
 		m_r = r;
 		m_g = g;
 		m_b = b;
+		m_energy = null;
+	}
+	
+	public Pixel(int r, int g, int b, double energy)
+	{
+		if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
+		{
+			throw new IllegalArgumentException("rgb values must be between 0 and 255");
+		}
+		
+		m_r = r;
+		m_g = g;
+		m_b = b;
+		m_energy = energy;
 	}
 	
 	final public int r()
@@ -40,6 +56,12 @@ public class Pixel {
 	final public int b()
 	{
 		return m_b;
+	}
+	
+	// result may be null
+	final public Double energy()
+	{
+		return m_energy;
 	}
 	
 	public int asInt()
