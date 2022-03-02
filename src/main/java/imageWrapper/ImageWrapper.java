@@ -52,6 +52,17 @@ public class ImageWrapper {
 		m_data[y][x] = p;
 	}
 	
+	public Double getEnergy(int x, int y)
+	{
+		return m_data[y][x].energy();
+	}
+	
+	public void setEnergy(int x, int y, double energy)
+	{
+		Pixel p = m_data[y][x];
+		m_data[y][x] = new Pixel(p.r(), p.g(), p.b(), energy);
+	}
+	
 	public int getWidth()
 	{
 		return m_data[0].length;
