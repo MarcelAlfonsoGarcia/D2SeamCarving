@@ -94,7 +94,7 @@ public class ImagePanel extends Thread {
         ImageIcon icon = new ImageIcon(bi);
         imageDisplay.setIcon(icon);
 
-        MainPanel.changeFrameSize(bi.getWidth() + 50, bi.getHeight() + 140);
+        MainPanel.changeFrameSize(bi.getWidth() + 70, bi.getHeight() + 140);
     }
 
     public static void saveImage() throws IOException {
@@ -119,6 +119,6 @@ public class ImagePanel extends Thread {
         ImageIcon icon = new ImageIcon(bi);
         imageDisplay.setIcon(icon);
 
-        MainPanel.changeFrameSize(bi.getWidth() + 50, bi.getHeight() + 140);
+        MainPanel.changeFrameSize(bi.getWidth() + 70, bi.getHeight() + 140);
     }
 }
