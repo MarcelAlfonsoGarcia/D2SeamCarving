@@ -4,6 +4,8 @@
 
 Marcel Alfonso Garcia, Joe Pokorny, Caleb Papay, Alex Whitehair
 
+## Design Document
+
 ### What will you teach?
 
 #### Learning Objectives:
@@ -90,3 +92,56 @@ functionalities work well independently as well as together.
 * Alex will build the image data interface/class as well as code to load and save images to/from the file system by Mar
   3rd
 
+## Test Plan
+
+### Test Descriptions
+
+* **calculateImageEnergy**
+    * This will test the method that sets pixel Energy for all the pixels in an image
+    * Ensures that every pixel is assigned the proper pixel energy for the whole image
+    * Input: A simple 3x3 image with black pixels at determined locations
+    * Output: values for energy of all pixels in image calculated by hand
+* **calculatePixelEnergy**
+    * This will test the method that calculates the pixel energy for each pixel in an image.
+    * Ensures that for a given pixel, the correct energy value is calculated
+    * Input: A simple 3x3 image with black pixels at determined locations
+    * Output: values for the energy of a given pixel determined by hand
+* **findSeam**
+    * This will test the method that finds the optimal path of energy (seam) through the image
+    * Ensures that the seam found is the path (horizontal or vertical) through the image that has the least total energy
+    * Input: A simple 3x3 image with known pixel energy for all 9 pixels
+    * Output: the vertical or horizontal series of pixels from top to bottom or left to right respectively (determined
+      on paper) that has the lowest total energy
+* **ImageWrapper.removeHorizontalSeam** and **removeVerticalSeam**
+    * This test will verify the removeHorizontal/Vertical seam methods remove only the correct pixels, specified by a
+      seam from an image
+    * Input: a simple 3x3 image with known contents, various seams to remove
+    * Output: a resulting image with the pixels removed specified by the seam
+
+### User Actions:
+
+* We expect the user to select a file, a number of seams to carve, and a seam direction before clicking _Submit_ in
+  order to perform the carves.
+    * If they don’t select a file, an exception will appear in the GUI notifying them
+    * The program is set to not allow the user to select files not in the Image formats (png, jpeg, etc…)
+    * If they don’t set a number of carves, an exception will appear in the GUI notifying them
+    * One of the carve directions will be selected on startup and because they are radio buttons they will never be both
+      null, but we will still have an error appear just in case (can’t trust users too much)
+* They should then be able to click on _Next_ the next seam to be removed highlighted in red, and click again to see the
+  image with the seam removed. This will be allowed until all steps are seen and the image is fully carved.
+    * If no image has been submitted, an error will appear
+    * Once the user reaches the end of the image carousel, nothing will happen
+* By clicking _Prev_ they should be able to go backwards in the process.
+    * If no image has been submitted, an error will appear
+    * Once the user reaches the beginning of the image carousel, nothing will happen
+* By clicking _Last_ they should be able to see the last image, i.e. the image after it has been carved
+    * If no image has been submitted, an error will appear
+* By clicking _Save_ they should be able to save the image they are currently viewing
+    * If no image is being shown an error will appear
+* Lastly, by clicking _Animate_ they will see the seams be removed at a 50ps rate as if they were clicking on _Next_.
+  Once it reaches the end of the carousel, it will start again from the beginning. The user can stop the animation at
+  any time by clicking on _Stop Animate_ which will appear only after the _Animate_ button is clicked and disappears
+  once it has been clicked.
+    * If no image has been submitted, an error will appear
+    * We will have the animate automatically stop after a certain period of time in order to prevent having the infinite
+      while loop run forever.
