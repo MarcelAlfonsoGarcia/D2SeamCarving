@@ -28,7 +28,7 @@ public class MainPanel {
 
         contentPane.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
+        frame.setSize(900, 500);
         frame.setTitle("Carver");
         frame.setVisible(true);
     }
