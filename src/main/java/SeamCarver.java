@@ -74,7 +74,7 @@ public class SeamCarver {
 		
 		//handles edge cases where pixel is at bottom or top of image
 		if (y == height) {
-			aboveP = imageWrap.getPixel(x, y-1);
+			aboveP = imageWrap.getPixel(x, y-1); 
 			belowP = imageWrap.getPixel(x, 0);
 		}
 		else if (y == 0) {
@@ -83,8 +83,8 @@ public class SeamCarver {
 		}
 		//handles case where pixel is somewhere between top and bottom;
 		else {
-			aboveP = imageWrap.getPixel(x, y-x);
-			belowP = imageWrap.getPixel(x, y+1);
+			aboveP = imageWrap.getPixel(x, y-x); //for energy of pixel (1,1), (1,0)
+			belowP = imageWrap.getPixel(x, y+1);//for energy of pixel (1,1), (1,2)
 		}
 		
 		//handle edge cases where pixel is at far right or far left side of image
@@ -93,24 +93,24 @@ public class SeamCarver {
 			leftP  = imageWrap.getPixel(0, y);
 		}
 		else if (x == 0) {
-			rightP = imageWrap.getPixel(width, y);
-			leftP  = imageWrap.getPixel(x+1, y);
+			leftP = imageWrap.getPixel(width, y);
+			rightP  = imageWrap.getPixel(x+1, y);
 		}
 		//handles case where pixel is somewhere between left most and right most side of image;
 		else {
-			rightP = imageWrap.getPixel(x-1, y);
-			leftP  = imageWrap.getPixel(x+1,y);
+			leftP  = imageWrap.getPixel(x-1,y); //for energy of pixel (1,1), (0,1)
+			rightP = imageWrap.getPixel(x+1, y); //for energy of pixel (1,1), (2,1)
 		}
 		
-		int rX = rightP.r() - leftP.r();
-		int gX = rightP.g() - leftP.g();
-		int bX = rightP.b() - leftP.b();
-		
+		int rX = Math.abs(rightP.r() - leftP.r());
+		int gX = Math.abs(rightP.g() - leftP.g());
+		int bX = Math.abs(rightP.b() - leftP.b());
+
 		int xtot = rX + gX + bX;
-		
-		int rY = belowP.r() - aboveP.r();
-		int gY = belowP.g() - aboveP.g();
-		int bY = belowP.b() - aboveP.b();
+	
+		int rY = Math.abs(belowP.r() - aboveP.r());
+		int gY = Math.abs(belowP.g() - aboveP.g());
+		int bY = Math.abs(belowP.b() - aboveP.b());
 		
 		int ytot = rY + gY + bY;
 		
@@ -126,28 +126,94 @@ public class SeamCarver {
 	// using the pixels' energy as the weight for each step of the path
 	public static int[] findSeam(boolean bHorizontalSeam, final ImageWrapper imageWrap)
 	{
-		double[][] minEnergyForPath = new double [imageWrap.getHeight()] [imageWrap.getWidth()] ;
+		double[][] energyForPath = new double [imageWrap.getHeight()] [imageWrap.getWidth()] ;
 		
-		int[][] directionData = new int [imageWrap.getHeight()] [imageWrap.getWidth()] ;
-		
-		int[] seam;
+		int[][] dirData = new int [imageWrap.getHeight()] [imageWrap.getWidth()] ;
 		
 		int left = -1;
 		int cntr = 0;
 		int right = 1;
 		
+		int up = -1;
+		int down = 1;
 		
 		if(bHorizontalSeam == true) 
 		{
-			//TODO: HANDLE CASE FOR HORIZONTAL findSeam
-			seam = new int[imageWrap.getWidth()];
+			for (int x = imageWrap.getWidth()-1; x >= 0; x--)
+			{
+				
+				for (int y = 0; y < imageWrap.getHeight(); y++) 
+				{
+					if (x == imageWrap.getWidth()-1) 
+					{
+						energyForPath[y][x] = imageWrap.getEnergy(x, y);
+					}
+					else 
+					{	
+						Double energyCntr = energyForPath[y+cntr][x+1];	
+						
+						//handles cases with no "up" path because we're at the top of the image
+						if (y == 0) 
+						{
+							Double energyDown = energyForPath[y+down][x+1];
+							
+							if (energyDown < energyCntr) 
+								dirData[y][x] = down; //-1
+							
+							else
+								dirData[y][x] = cntr; // 0
+						}
+						
+						//handles cases with no "down" path because we're at the bottom of the image
+						else if( y == imageWrap.getHeight()-1 ) 
+						{
+							Double energyUp = energyForPath[y+up][x+1];
+							
+							if (energyUp < energyCntr) 
+								dirData[y][x] = up; //+1
+							
+							else
+								dirData[y][x] = cntr; //0
+						}
+						
+						//handles cases where we're somewhere between the top and bottom of image
+						else 
+						{
+							Double energyUp = energyForPath[y+up][x+1];
+							Double energyDown = energyForPath[y+down][x+1];
+							
+							boolean downWins;
+							
+							if (energyDown < energyUp)
+								downWins = true;
+							else
+								downWins = false;
+							
+							if (downWins == true) 
+							{
+								if (energyDown < energyCntr)
+									dirData[y][x] = down; //-1
+								else
+									dirData[y][x] = cntr; // 0
+							}
+							else 
+							{
+								if (energyUp < energyCntr)
+									dirData[y][x] = up; //+1
+								else
+									dirData[y][x] = cntr; // 0
+							}
+							
+						}
+						int direction = dirData[y][x];
+						energyForPath[y][x] = imageWrap.getEnergy(x, y) + energyForPath[y+direction][x+1];
+					}
+				
+				}
+			}
 		}
 		else {
-			
-			seam = new int[imageWrap.getHeight()];
-			//creating minEnergyForPath array and directionData array (make a separate function?)
-			
-			//poor memory access????
+			//creating minEnergyForPath array and directionData array
 			for (int y = imageWrap.getHeight()-1; y >= 0; y--) 
 			{
 				
@@ -156,125 +222,126 @@ public class SeamCarver {
 					//initialize bottom row of minEnergyForPath with energy values;
 					if (y == imageWrap.getHeight()-1) 
 					{
-						minEnergyForPath[y][x] = imageWrap.getEnergy(x, y);
+						energyForPath[y][x] = imageWrap.getEnergy(x, y);
 					}
 					else 
 					{
-						minEnergyForPath[y][x] = imageWrap.getEnergy(x, y);
-				
-						Double energyCntr = minEnergyForPath[y+1][x+cntr];
-						Double energyLeft; 
-						Double energyRight;
+						Double energyCntr = energyForPath[y+1][x+cntr];
 						
-						
-						//handles case with no left because we're at the left most side of image
+						//handles case with no left path because we're at the left most side of image
 						if (x == 0) 
 						{
-							energyLeft = null;
-							energyRight= minEnergyForPath[y+1][x+right];
+							Double energyRight= energyForPath[y+1][x+right];
 							
-							//case 1 (right < center, left doesn't exist)
 							if (energyRight < energyCntr) 
-								directionData[y][x] = right;
-							
-							//case 2 (center <= right, left doesn't exist)
-							else //tie goes to center
-								directionData[y][x] = cntr;
-							
+								dirData[y][x] = right;
+							else
+								dirData[y][x] = cntr;
 							
 						}
 						
-						//handles case with no right because we're at the right most side of image
+						//handles case with no right path because we're at the right most side of image
 						else if (x == imageWrap.getWidth()-1) 
 						{
-							energyLeft = minEnergyForPath[y+1][x+left];
-							energyRight= null;
+							Double energyLeft = energyForPath[y+1][x+left];
 							
-							//case 3 (left < center, right doesn't exist)
 							if (energyLeft < energyCntr) 
-								directionData[y][x] = left;
-							
-							//case 4 (center <= left, right doesn't exist)
-							else //tie goes to center
-								directionData[y][x] = cntr;
-							
-							
+								dirData[y][x] = left;
+							else 
+								dirData[y][x] = cntr;
 						}
 						
 						//handles case with both left and right, somewhere in middle of image
 						else 
 						{
-							energyLeft = minEnergyForPath[y+1][x+left];
-							energyRight= minEnergyForPath[y+1][x+right];
+							Double energyLeft = energyForPath[y+1][x+left];
+							Double energyRight= energyForPath[y+1][x+right];
 							
 							boolean rightWins;
 							
-							
 							if (energyRight < energyLeft) 
 								rightWins = true;
-							
-							else //tie goes to left 
+							else
 								rightWins = false;
 							
 							
 							if (rightWins == true) 
 							{
-								//case 5 (right < left and right < center)
 								if (energyRight < energyCntr) 
-									directionData[y][x] = right;
-								
-								//case 6 (right < left but center <= right)
-								else //tie goes to center
-									directionData[y][x] = cntr;
-								
+									dirData[y][x] = right;
+								else 
+									dirData[y][x] = cntr;
 							}
 							else 
 							{ 
-								//case 7 (left <= right and left < center)
 								if (energyLeft < energyCntr) 
-									directionData[y][x] = left;
-								
-								//case 8 (left <= right but center <= left)
-								else  //tie goes to center
-									directionData[y][x] = cntr;
-								
+									dirData[y][x] = left;
+								else 
+									dirData[y][x] = cntr;
 							}
-							
-							
 						}
-						int direction = directionData[x][y];
-						minEnergyForPath[y][x] += minEnergyForPath[y+1][x+direction]; 
 						
+						int direction = dirData[x][y];
+						energyForPath[y][x] = imageWrap.getEnergy(x, y) + energyForPath[y+1][x+direction];
 					}
 				}
 			}
+		}
+		int[] seam = fillSeam(bHorizontalSeam, energyForPath, dirData, imageWrap);
+		return seam;
+	}
+	
+	private static int[] fillSeam(boolean bHorizontalSeam, double[][] energyPath, int[][] directions, final ImageWrapper imageWrap) 
+	{
+		int[] seam;
+		
+		if (bHorizontalSeam == true) 
+		{
+			seam = new int[imageWrap.getWidth()];
 			
-			//find start pixel at top;
-			double startPixelPathEnergy = minEnergyForPath[0][0];
+			double startPixelPathEnergy = energyPath[0][0];
 			int startPixelIndex = 0;
 			
-			//inefficient search but only need to do this with top row of pixels.
-			for(int x = 1; x<imageWrap.getWidth(); x++) 
+			for(int y = 1; y < imageWrap.getHeight(); y++) 
 			{
-				if(minEnergyForPath[0][x] < startPixelPathEnergy) 
-				{ 
-					startPixelPathEnergy = minEnergyForPath[0][x];
-					startPixelIndex = x;
+				if(energyPath[y][0] < startPixelPathEnergy) 
+				{
+					startPixelPathEnergy = energyPath[y][0];
+					startPixelIndex = y;
 				}
-				
 			}
-			
-			//filling seam[] with values. 
-			//the index of the seam is the row of the pixel to be removed, 
-			//the value at said index is the column of the pixel to be removed.
 			seam[0] = startPixelIndex;
 			
-			for( int i = 1; i<imageWrap.getHeight(); i++) 
-			{
-				seam[i] = seam[i-1] + directionData[i-1][seam[i-1]]; 
-			}
+			for (int i = 1; i < imageWrap.getWidth(); i++)
+				seam[i] = seam[i-1] + directions[i-1][seam[i-1]];
+			
+			return seam;
 			
 		}
+		
+		seam = new int[imageWrap.getHeight()];
+		
+		//find start pixel at top;
+		double startPixelPathEnergy = energyPath[0][0];
+		int startPixelIndex = 0;
+			
+		for(int x = 1; x<imageWrap.getWidth(); x++) 
+		{
+			if(energyPath[0][x] < startPixelPathEnergy) 
+			{ 
+				startPixelPathEnergy = energyPath[0][x];
+				startPixelIndex = x;
+			}
+				
+		}
+			
+		seam[0] = startPixelIndex;
+			
+		for( int i = 1; i<imageWrap.getHeight(); i++)
+			seam[i] = seam[i-1] + directions[i-1][seam[i-1]]; 
+		
 		return seam;
 	}
 }
+
+
