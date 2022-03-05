@@ -94,7 +94,10 @@ public class ImagePanel extends Thread {
         ImageIcon icon = new ImageIcon(bi);
         imageDisplay.setIcon(icon);
 
-        MainPanel.changeFrameSize(bi.getWidth() + 70, bi.getHeight() + 140);
+        int newWidth = Math.max(bi.getWidth() + 70, 900);
+        int newHeight = Math.max(bi.getHeight() + 140, 500);
+
+        MainPanel.changeFrameSize(newWidth, newHeight);
     }
 
     public static void saveImage() throws IOException {
@@ -103,8 +106,9 @@ public class ImagePanel extends Thread {
             return;
         }
         BufferedImage bi = images.get(currentImage);
-        File carvedImage = new File("./carvedImage.jpg");
-        ImageIO.write(bi, "JPEG", carvedImage);
+
+        File carvedImage = new File("./carvedImage.png");
+        ImageIO.write(bi, "png", carvedImage);
     }
 
     public static void viewEnergy() {
@@ -119,6 +123,9 @@ public class ImagePanel extends Thread {
         ImageIcon icon = new ImageIcon(bi);
         imageDisplay.setIcon(icon);
 
-        MainPanel.changeFrameSize(bi.getWidth() + 70, bi.getHeight() + 140);
+        int newWidth = Math.max(bi.getWidth() + 70, 900);
+        int newHeight = Math.max(bi.getHeight() + 140, 500);
+
+        MainPanel.changeFrameSize(newWidth, newHeight);
     }
 }
