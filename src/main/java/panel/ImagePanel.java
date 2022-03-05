@@ -2,6 +2,10 @@ package panel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import carver.SeamCarver;
+import imageWrapper.ImageWrapper;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -118,9 +122,11 @@ public class ImagePanel extends Thread {
         }
 
         var bi = images.get(currentImage);
-        // we will need a function that takes in a BufferedImage and calculates the energy into a BufferedImage arr
-        BufferedImage energyBI = null;
-        ImageIcon icon = new ImageIcon(bi);
+        
+        ImageWrapper wrap = new ImageWrapper(bi);
+        SeamCarver.calculateImageEnergy(wrap);
+        BufferedImage energyBI = ImageWrapper.generateEnergyImage(wrap);
+        ImageIcon icon = new ImageIcon(energyBI);
         imageDisplay.setIcon(icon);
 
         int newWidth = Math.max(bi.getWidth() + 70, 900);
