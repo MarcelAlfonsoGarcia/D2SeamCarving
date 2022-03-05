@@ -10,7 +10,7 @@ import java.util.List;
 public class SeamCarver {
 
     public static List<BufferedImage> carve(boolean bHorizontalSeam, int nCarves, ImageWrapper imageWrap) {
-        final int maxImages = 100;
+        final int maxImages = 50;
         int saveImageEveryN = 1;
         if (nCarves > maxImages) {
             saveImageEveryN = (int) Math.floor((double) nCarves / (double) maxImages);

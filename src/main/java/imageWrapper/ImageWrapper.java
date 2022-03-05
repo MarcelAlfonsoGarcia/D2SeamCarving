@@ -42,12 +42,12 @@ public class ImageWrapper {
 	
 	public void setPixel(int x, int y, Pixel p)
 	{
-		if (x < 0 || x > m_data.length)
-			throw new IllegalArgumentException("x value outside boundary!");
-		
-		var row = m_data[x];
-		if (y < 0 || y > row.length)
+		if (y < 0 || y >= m_data.length)
 			throw new IllegalArgumentException("y value outside boundary!");
+		
+		var row = m_data[y];
+		if (x < 0 || x >= row.length)
+			throw new IllegalArgumentException("x value outside boundary!");
 		
 		m_data[y][x] = p;
 	}
@@ -135,6 +135,35 @@ public class ImageWrapper {
 		}
 		
 		return result;
+	}
+	
+	public static Pixel energyAsPixelColor(double dbEnergy, double dbMaxEnergy)
+	{
+		double dbPercentage = dbEnergy / dbMaxEnergy;
+		int nRGB = (int)(255.0 * dbPercentage);
+		return new Pixel(nRGB, nRGB, nRGB);
+	}
+	
+	public static BufferedImage generateEnergyImage(ImageWrapper imageWrap)
+	{	
+		ImageWrapper result = new ImageWrapper(imageWrap.getWidth(), imageWrap.getHeight());
+		
+		// find max energy value in the image
+		double dbMax = 0.0;
+		for (int y = 0; y < imageWrap.getHeight(); ++y)
+			for (int x = 0; x < imageWrap.getWidth(); ++x)
+				dbMax = Math.max(dbMax, imageWrap.getEnergy(x, y));
+		
+		for (int y = 0; y < imageWrap.getHeight(); ++y)
+		{
+			for (int x = 0; x < imageWrap.getWidth(); ++x)
+			{
+				double dbEnergy = imageWrap.getEnergy(x, y);
+				result.setPixel(x, y, energyAsPixelColor(dbEnergy, dbMax));
+			}
+		}
+		
+		return result.currentContentsAsImage();
 	}
 	
 	static private Pixel[][] initPixelArray(int width, int height)
