@@ -1,5 +1,6 @@
 package panel;
 
+import carver.SeamCarver;
 import imageWrapper.ImageWrapper;
 
 import javax.imageio.ImageIO;
@@ -109,7 +110,7 @@ public class SettingsPanel {
                 }
 
                 // here is where we will call the carving functions. Expected result is a List<BufferedImage>
-                var carvedUpImages = reallyDumbSeamCarvingAlgorithmToReplaceWithRealOne(bHorizontalSeam, numberCarves, imageWrap);
+                var carvedUpImages = SeamCarver.carve(bHorizontalSeam, numberCarves, imageWrap);
                 ImagePanel.addImages(carvedUpImages);
             }
         });
