@@ -31,7 +31,8 @@ public class ImageWrapperTest {
 
     @Test
     public void removeStraightHorizontalSeam() {
-    	// Pixel Energies
+    	// removes a horizontal seam across the top row
+    	//
     	// Start  --> End
     	// 0 1 2       3 4 5
     	// 3 4 5  -->  6 7 8
@@ -60,7 +61,10 @@ public class ImageWrapperTest {
     
     @Test 
     public void removeDiagonalHorizontalSeam() {
-    	// Pixel Energies
+
+    	// removes a diagonal seam from top left to bottom right
+    	// contents should move upward in columns
+    	//
     	// Start  --> End
     	// 0 1 2       3 1 2
     	// 3 4 5  -->  6 7 5
@@ -87,7 +91,9 @@ public class ImageWrapperTest {
 
     @Test
     public void removeStraightVerticalSeam() {
-    	// Pixel Energies
+    	
+    	// removes a vertical seam down first column
+    	//
     	// Start  --> End
     	// 0 1 2       1 2
     	// 3 4 5  -->  4 5
@@ -117,7 +123,10 @@ public class ImageWrapperTest {
     
     @Test
     public void removeDiagonalVerticalSeam() {
-    	// Pixel Energies
+    	// Removes a diagonal seam from top left
+    	// to bottom right contents should move
+    	// horizontally left in rows
+    	//
     	// Start  --> End
     	// 0 1 2       1 2
     	// 3 4 5  -->  3 5
