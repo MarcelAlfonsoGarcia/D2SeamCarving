@@ -277,7 +277,7 @@ public class SeamCarver {
             seam[0] = startPixelIndex;
 
             for (int i = 1; i < imageWrap.getWidth(); i++)
-                seam[i] = seam[i - 1] + directions[i - 1][seam[i - 1]];
+                seam[i] = seam[i - 1] + directions[seam[i-1]][i - 1];
 
             return seam;
 
